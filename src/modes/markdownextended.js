@@ -121,19 +121,19 @@ CodeMirror.defineMode(
       state.linkTitle = false;
       state.linkHref = false;
       state.linkText = false;
-      
+
       // Reset EM state
       state.em = false;
-      
+
       // Reset STRONG state
       state.strong = false;
-      
+
       // Reset strikethrough state
       state.strikethrough = false;
-      
+
       // Reset state.quote
       state.quote = 0;
-      
+
       // Reset state.indentedCode
       state.indentedCode = false;
 
@@ -143,7 +143,7 @@ CodeMirror.defineMode(
         // state.thisLine.formatting = 'line-local';
         returnState = 'line-cm-blockcode';
       }
-      
+
       if (state.f == htmlBlock) {
         var exit = htmlModeMissing;
         if (!exit) {
@@ -161,7 +161,7 @@ CodeMirror.defineMode(
       // Reset state.trailingSpace
       state.trailingSpace = 0;
       state.trailingSpaceNewLine = false;
-      
+
       // Mark this line as blank
       state.prevLine = state.thisLine;
       // state.thisLine = {
@@ -287,18 +287,18 @@ CodeMirror.defineMode(
           state.formatting = ['list', `list-${listType}`];
         return getType(state);
       } else if (firstTokenOnLine && state.indentation <= maxNonCodeIndentation && (match = stream.match(fencedCodeRE, true))) {
-        
+
         state.quote = 0;
         state.fencedEndRE = new RegExp(match[1] + '+ *$');
         // try switching mode
         state.localMode = modeCfg.fencedCodeBlockHighlighting && getMode(match[2]);
-        
+
         if (state.localMode) {
           state.localState = CodeMirror.startState(state.localMode);
         }
-        
+
         state.f = state.block = local;
-        
+
         if (modeCfg.highlightFormatting) {
           state.formatting = 'blockcode';
         }
@@ -364,34 +364,34 @@ CodeMirror.defineMode(
     }
 
     function local(stream, state) {
-      
+
       var currListInd = state.listStack[state.listStack.length - 1] || 0;
       var hasExitedList = state.indentation < currListInd;
       var maxFencedEndInd = currListInd + 3;
-      
+
       if (state.fencedEndRE && state.indentation <= maxFencedEndInd && (hasExitedList || stream.match(state.fencedEndRE))) {
-        
+
         if (modeCfg.highlightFormatting) {
           state.formatting = 'blockcode';
         }
 
         var returnType;
-        
+
         if (!hasExitedList) {
           returnType = getType(state);
         }
-        
+
         state.localMode = state.localState = null;
         state.block = blockNormal;
         state.f = inlineNormal;
         state.fencedEndRE = null;
         state.code = 0;
         state.thisLine.fencedCodeEnd = true;
-        
+
         if (hasExitedList) {
           return switchBlock(stream, state, state.block);
         }
-        
+
         return returnType;
       } else if (state.localMode) {
         // By prepending `line-cm-code` every line of the local
@@ -414,7 +414,7 @@ CodeMirror.defineMode(
           state.formatting = [state.formatting];
 
         for (var i = 0; i < state.formatting.length; i++) {
-          
+
           if (!/^(list-|blockcode)/.test(state.formatting[i])) {
             styles.push(tokenTypes.formatting + '-' + state.formatting[i]);
           } else {
@@ -745,17 +745,17 @@ CodeMirror.defineMode(
           if (modeCfg.highlightFormatting) {
             state.formatting = setEm == null ? 'strong' : setStrong == null ? 'em' : 'strong em';
           }
-          
+
           if (setEm === true) {
             state.em = ch;
           }
-          
+
           if (setStrong === true) {
             state.strong = ch;
           }
-          
+
           var t = getType(state);
-          
+
           if (setEm === false) {
             state.em = false;
           }
@@ -789,7 +789,7 @@ CodeMirror.defineMode(
             }
             var t = getType(state);
             state.strikethrough = false;
-            
+
             return t;
 
           } else if (stream.match(/^[^\s]/, false)) {
@@ -817,11 +817,11 @@ CodeMirror.defineMode(
 
       if (modeCfg.emoji && ch === ':' && stream.match(/^[a-z_\d+-]+:/)) {
         state.emoji = true;
-        
+
         if (modeCfg.highlightFormatting) {
           state.formatting = 'emoji';
         }
-        
+
         var retType = getType(state);
         state.emoji = false;
         return retType;
@@ -1034,10 +1034,10 @@ CodeMirror.defineMode(
           state.header = 0;
           state.hr = false;
 
-          // if (stream.match(/^\s*$/, true)) {
-          //   blankLine(state);
-          //   return null;
-          // }
+          if (stream.match(/^\s*$/, true)) {
+            return blankLine(state);
+            // return null;
+          }
 
           state.prevLine = state.thisLine;
           state.thisLine = {
